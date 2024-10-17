@@ -27,9 +27,7 @@ public class Post implements Serializable {
 
     private String title;
     private String content;
-
-    @ManyToOne
-    private User author;
+    private String author;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
