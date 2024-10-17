@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 public class Post implements Serializable {
 
     @java.io.Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,8 +27,14 @@ public class Post implements Serializable {
 
     private String title;
     private String content;
-    private String author;
+
+    @ManyToOne
+    private User author;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Like> likes = new ArrayList<>();
 }

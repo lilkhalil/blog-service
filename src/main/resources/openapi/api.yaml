@@ -10,6 +10,8 @@ servers:
 tags:
   - name: Post
     description: функционал управления постами
+  - name: Like
+    description: функционал управления лайками
 paths:
   /posts:
     get:
@@ -116,6 +118,45 @@ paths:
           description: Пост успешно удален
         '404':
           description: Пост не найден
+  /posts/{postId}/like:
+    post:
+      tags:
+        - Like
+      operationId: submitLike
+      summary: Поставить лайк посту
+      description: Поставить лайк посту по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Лайк успешно поставлен
+        '400':
+          description: Лайк уже поставлен данным пользователем
+        '404':
+          description: Пост не найден
+    delete:
+      tags:
+        - Like
+      operationId: unsumbitLike
+      summary: Убрать лайк с поста
+      description: Убрать лайк с поста по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Лайк успешно убран
+        '404':
+          description: Пост не найден
 components:
   schemas:
     Post:
@@ -132,8 +173,7 @@ components:
           type: string
           example: 'С 29 октября Red Dead Redemption будет доступна на всех современных платформах: ПК, PS4, PS5, Nintendo Switch, Xbox One и Xbox Series.'
         author:
-          type: string
-          example: 'Айдар Халилов'
+          $ref: '#/components/schemas/User'
         createdAt:
           type: string
           format: date-time
@@ -142,6 +182,9 @@ components:
           type: string
           format: date-time
           example: '2024-01-02T12:00:00Z'
+        likeCount:
+          type: integer
+          example: 25
     PostRq:
       type: object
       required:
@@ -156,5 +199,40 @@ components:
           type: string
           example: 'С 29 октября Red Dead Redemption будет доступна на всех современных платформах: ПК, PS4, PS5, Nintendo Switch, Xbox One и Xbox Series.'
         author:
+          $ref: '#/components/schemas/UserRq'
+    User:
+      type: object
+      properties:
+        firstName:
           type: string
-          example: 'Айдар Халилов'
+          example: 'Айдар'
+        lastName:
+          type: string
+          example: 'Халилов'
+        username:
+          type: string
+          example: 'morelz1'
+        email:
+          type: string
+          example: 'aidarkhalilov4021@mail.ru'
+          format: email
+    UserRq:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        firstName:
+          type: string
+          example: 'Айдар'
+        lastName:
+          type: string
+          example: 'Халилов'
+        username:
+          type: string
+          example: 'morelz1'
+        email:
+          type: string
+          example: 'aidarkhalilov4021@mail.ru'
+          format: email
