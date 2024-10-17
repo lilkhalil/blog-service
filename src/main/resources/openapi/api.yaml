@@ -1,0 +1,160 @@
+openapi: 3.0.3
+info:
+  title: Blog Service
+  description: Необходимо разработать веб-сервис блога с базовым функционалом
+  version: 0.0.1
+  contact:
+    email: aidarkhalilov4021@mail.ru
+servers:
+  - url: 'http://localhost:8080/api/v1'
+tags:
+  - name: Post
+    description: функционал управления постами
+paths:
+  /posts:
+    get:
+      tags:
+        - Post
+      operationId: getPosts
+      summary: Получение списка постов
+      description: Получить список всех постов в блоге.
+      responses:
+        '200':
+          description: Список постов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      tags:
+        - Post
+      operationId: createPost
+      summary: Создание поста
+      description: Добавить новый пост в блог.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRq'
+      responses:
+        '201':
+          description: Пост успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+  /posts/{postId}:
+    get:
+      tags:
+        - Post
+      operationId: getPost
+      summary: Получение информации о конкретном посте
+      description: Получить информацию о посте по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Информация о посте
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Пост не найден
+    put:
+      tags:
+        - Post
+      operationId: updatePost
+      summary: Изменение поста
+      description: Изменить пост в блоге по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRq'
+      responses:
+        '200':
+          description: Пост успешно изменен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Пост не найден
+    delete:
+      tags:
+        - Post
+      operationId: deletePost
+      summary: Удаление поста
+      description: Удалить сообщение в блоге по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Пост успешно удален
+        '404':
+          description: Пост не найден
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 13
+          format: int64
+        title:
+          type: string
+          example: 'Выход Red Dead Redemption на PC'
+        content:
+          type: string
+          example: 'С 29 октября Red Dead Redemption будет доступна на всех современных платформах: ПК, PS4, PS5, Nintendo Switch, Xbox One и Xbox Series.'
+        author:
+          type: string
+          example: 'Айдар Халилов'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-01-02T12:00:00Z'
+    PostRq:
+      type: object
+      required:
+        - title
+        - content
+        - author
+      properties:
+        title:
+          type: string
+          example: 'Выход Red Dead Redemption на PC'
+        content:
+          type: string
+          example: 'С 29 октября Red Dead Redemption будет доступна на всех современных платформах: ПК, PS4, PS5, Nintendo Switch, Xbox One и Xbox Series.'
+        author:
+          type: string
+          example: 'Айдар Халилов'
