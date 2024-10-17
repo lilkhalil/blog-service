@@ -31,7 +31,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Optional<PostDto> findById(Long postId) {
-        return postRepository.findById(postId).map(postMapper::postToPostDto);
+        return postRepository.findById(postId)
+                .map(postMapper::postToPostDto);
     }
 
     @Override
@@ -51,11 +52,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Optional<PostDto> updatePost(Long postId, PostRqDto requestBody) {
-        Optional<Post> post = postRepository.findById(postId).map(p -> p.setUpdatedAt(LocalDateTime.now())
-                .setTitle(requestBody.getTitle())
-                .setContent(requestBody.getContent())
-                .setAuthor(requestBody.getAuthor()));
-        post.ifPresent(postRepository::saveAndFlush);
-        return post.map(postMapper::postToPostDto);
+        return postRepository.findById(postId)
+                .map(post -> post.setUpdatedAt(LocalDateTime.now())
+                        .setTitle(requestBody.getTitle())
+                        .setContent(requestBody.getContent())
+                        .setAuthor(requestBody.getAuthor()))
+                .map(postRepository::saveAndFlush)
+                .map(postMapper::postToPostDto);
     }
 }

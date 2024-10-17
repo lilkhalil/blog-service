@@ -10,6 +10,8 @@ servers:
 tags:
   - name: Post
     description: функционал управления постами
+  - name: Like
+    description: функционал управления лайками
 paths:
   /posts:
     get:
@@ -116,6 +118,45 @@ paths:
           description: Пост успешно удален
         '404':
           description: Пост не найден
+  /posts/{postId}/like:
+    post:
+      tags:
+        - Like
+      operationId: submitLike
+      summary: Поставить лайк посту
+      description: Поставить лайк посту по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Лайк успешно поставлен
+        '400':
+          description: Лайк уже поставлен данным пользователем
+        '404':
+          description: Пост не найден
+    delete:
+      tags:
+        - Like
+      operationId: unsumbitLike
+      summary: Убрать лайк с поста
+      description: Убрать лайк с поста по его идентификатору.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Лайк успешно убран
+        '404':
+          description: Пост не найден
 components:
   schemas:
     Post:
@@ -142,6 +183,9 @@ components:
           type: string
           format: date-time
           example: '2024-01-02T12:00:00Z'
+        likeCount:
+          type: integer
+          example: 12
     PostRq:
       type: object
       required:
