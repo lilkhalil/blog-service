@@ -7,10 +7,5 @@ spring:
     username: postgres
     password: 1
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+      ddl-auto: update

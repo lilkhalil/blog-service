@@ -32,9 +32,11 @@ public class LikeServiceImpl implements LikeService {
     public void unsumbitLike(Long postId) {
         postRepository.findById(postId)
                 .map(likeRepository::findByPost)
-                .ifPresent(likes -> likes.stream().findAny()
+                .ifPresentOrElse(likes -> likes.stream().findAny()
                         .ifPresentOrElse(likeRepository::delete, () -> {
                             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                        }));
+                        }), () -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                });
     }
 }
