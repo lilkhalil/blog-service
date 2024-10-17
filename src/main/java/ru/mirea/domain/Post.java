@@ -19,7 +19,7 @@ import java.util.List;
 public class Post implements Serializable {
 
     @java.io.Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,7 +27,9 @@ public class Post implements Serializable {
 
     private String title;
     private String content;
-    private String author;
+
+    @ManyToOne
+    private User author;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
