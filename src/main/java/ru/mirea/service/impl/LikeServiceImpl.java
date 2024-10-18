@@ -1,10 +1,10 @@
 package ru.mirea.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.mirea.domain.Like;
+import ru.mirea.exception.LikeNotFoundException;
+import ru.mirea.exception.PostNotFoundException;
 import ru.mirea.repository.LikeRepository;
 import ru.mirea.repository.PostRepository;
 import ru.mirea.service.LikeService;
@@ -24,7 +24,7 @@ public class LikeServiceImpl implements LikeService {
                 .post(post)
                 .submittedAt(LocalDateTime.now())
                 .build()), () -> {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new PostNotFoundException(postId);
         });
     }
 
@@ -34,9 +34,9 @@ public class LikeServiceImpl implements LikeService {
                 .map(likeRepository::findByPost)
                 .ifPresentOrElse(likes -> likes.stream().findAny()
                         .ifPresentOrElse(likeRepository::delete, () -> {
-                            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                            throw new LikeNotFoundException(postId);
                         }), () -> {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                    throw new PostNotFoundException(postId);
                 });
     }
 }

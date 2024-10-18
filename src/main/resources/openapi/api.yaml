@@ -48,6 +48,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
+        '400':
+          description: Ошибка валидации данных поста
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /posts/{postId}:
     get:
@@ -71,7 +77,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
         '404':
-          description: Пост не найден
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       tags:
         - Post
@@ -98,8 +108,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
+        '400':
+          description: Ошибка валидации данных поста
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
-          description: Пост не найден
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       tags:
         - Post
@@ -117,7 +137,11 @@ paths:
         '204':
           description: Пост успешно удален
         '404':
-          description: Пост не найден
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /posts/{postId}/like:
     post:
       tags:
@@ -135,10 +159,12 @@ paths:
       responses:
         '200':
           description: Лайк успешно поставлен
-        '400':
-          description: Лайк уже поставлен данным пользователем
         '404':
-          description: Пост не найден
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       tags:
         - Like
@@ -156,7 +182,12 @@ paths:
         '204':
           description: Лайк успешно убран
         '404':
-          description: Пост не найден
+          description: Пост с данным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Post:
@@ -196,9 +227,28 @@ components:
         title:
           type: string
           example: 'Выход Red Dead Redemption на PC'
+          minLength: 10
+          maxLength: 50
+          pattern: "^(?!\\s*$).+"
         content:
           type: string
           example: 'С 29 октября Red Dead Redemption будет доступна на всех современных платформах: ПК, PS4, PS5, Nintendo Switch, Xbox One и Xbox Series.'
+          minLength: 20
+          maxLength: 5000
         author:
           type: string
           example: 'Айдар Халилов'
+          minLength: 3
+          maxLength: 50
+          pattern: "^[a-zA-Zа-яА-Я'\\s-]+$"
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Числовой код ошибки, указывающий тип ошибки.
+          example: 400
+        message:
+          type: string
+          description: Читабельное сообщение с описанием ошибки.
+          example: Ошибка данных запроса
