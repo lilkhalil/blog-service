@@ -3,7 +3,7 @@ FROM maven:3.9.7-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 COPY . /app
 
-RUN [ "mvn", "clean", "package", "-DskipTests" ]
+RUN [ "mvn", "clean", "package" ]
 
 FROM eclipse-temurin:17-jre-alpine
 

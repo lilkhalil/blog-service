@@ -1,6 +1,5 @@
 package ru.mirea.service.impl;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.mirea.domain.Post;
@@ -36,7 +35,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto createPost(@Valid PostRqDto requestBody) {
+    public PostDto createPost(PostRqDto requestBody) {
         Post post = postMapper.createPostRqDtoToPost(requestBody);
         post.setCreatedAt(LocalDateTime.now());
         postRepository.saveAndFlush(post);
@@ -51,14 +50,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto updatePost(Long postId, @Valid PostRqDto requestBody) {
-        return postRepository.findById(postId)
-                .map(post -> post.setUpdatedAt(LocalDateTime.now())
-                        .setTitle(requestBody.getTitle())
-                        .setContent(requestBody.getContent())
-                        .setAuthor(requestBody.getAuthor()))
-                .map(postRepository::saveAndFlush)
-                .map(postMapper::postToPostDto)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+    public PostDto updatePost(Long postId, PostRqDto requestBody) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+        post.setUpdatedAt(LocalDateTime.now())
+                .setTitle(requestBody.getTitle())
+                .setContent(requestBody.getContent())
+                .setAuthor(requestBody.getAuthor());
+
+        postRepository.saveAndFlush(post);
+
+        return postMapper.postToPostDto(post);
     }
 }
