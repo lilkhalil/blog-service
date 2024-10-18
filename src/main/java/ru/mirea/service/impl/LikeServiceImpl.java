@@ -3,6 +3,7 @@ package ru.mirea.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.mirea.domain.Like;
+import ru.mirea.domain.Post;
 import ru.mirea.exception.LikeNotFoundException;
 import ru.mirea.exception.PostNotFoundException;
 import ru.mirea.repository.LikeRepository;
@@ -20,23 +21,25 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public void submitLike(Long postId) {
-        postRepository.findById(postId).ifPresentOrElse(post -> likeRepository.save(Like.builder()
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+
+        Like like = Like.builder()
                 .post(post)
                 .submittedAt(LocalDateTime.now())
-                .build()), () -> {
-            throw new PostNotFoundException(postId);
-        });
+                .build();
+
+        likeRepository.save(like);
     }
 
     @Override
     public void unsumbitLike(Long postId) {
-        postRepository.findById(postId)
-                .map(likeRepository::findByPost)
-                .ifPresentOrElse(likes -> likes.stream().findAny()
-                        .ifPresentOrElse(likeRepository::delete, () -> {
-                            throw new LikeNotFoundException(postId);
-                        }), () -> {
-                    throw new PostNotFoundException(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+
+        likeRepository.findByPost(post).stream()
+                .findAny()
+                .ifPresentOrElse(likeRepository::delete, () -> {
+                    throw new LikeNotFoundException(postId);
                 });
     }
 }
