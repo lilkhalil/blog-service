@@ -5,10 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.mirea.domain.Like;
 import ru.mirea.domain.Post;
 import ru.mirea.exception.LikeNotFoundException;
-import ru.mirea.exception.PostNotFoundException;
 import ru.mirea.repository.LikeRepository;
-import ru.mirea.repository.PostRepository;
 import ru.mirea.service.LikeService;
+import ru.mirea.service.PostService;
 
 import java.time.LocalDateTime;
 
@@ -16,12 +15,12 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class LikeServiceImpl implements LikeService {
 
-    private final PostRepository postRepository;
+    private final PostService postService;
     private final LikeRepository likeRepository;
 
     @Override
     public void submitLike(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+        Post post = postService.findById(postId);
 
         Like like = Like.builder()
                 .post(post)
@@ -33,13 +32,17 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public void unsumbitLike(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+        Post post = postService.findById(postId);
 
         likeRepository.findByPost(post).stream()
                 .findAny()
                 .ifPresentOrElse(likeRepository::delete, () -> {
                     throw new LikeNotFoundException(postId);
                 });
+    }
+
+    @Override
+    public Integer countLikesByPost(Post post) {
+        return likeRepository.countByPost(post);
     }
 }

@@ -31,15 +31,10 @@ class PostServiceImplTest {
     @Mock
     private PostRepository postRepository;
 
-    @Spy
-    private final PostMapper postMapper = new PostMapperImpl();
-
     @InjectMocks
     private PostServiceImpl postService;
 
     private Post post;
-    private PostDto postDto;
-
 
     @BeforeEach()
     public void setUp() {
@@ -49,29 +44,27 @@ class PostServiceImplTest {
                 .content("Content")
                 .author("Aidar Khalilov")
                 .build();
-
-        postDto = postMapper.postToPostDto(post);
     }
 
     @Test
     public void test_findAll_expectNonEmptyArray() {
         when(postRepository.findAll()).thenReturn(List.of(post));
 
-        List<PostDto> posts = postService.findAll();
+        List<Post> posts = postService.findAll();
 
         assertThat(posts)
                 .hasSize(1)
-                .contains(postDto);
+                .contains(post);
     }
 
     @Test
     public void test_findById_expectValue() {
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
-        PostDto actual = postService.findById(1L);
+        Post actual = postService.findById(1L);
 
         assertThat(actual)
-                .isEqualTo(postDto);
+                .isEqualTo(post);
     }
 
     @Test
@@ -83,13 +76,13 @@ class PostServiceImplTest {
 
     @Test
     public void test_createPost_expectValue() {
-        PostDto actual = postService.createPost(new PostRqDto());
-
         ArgumentCaptor<Post> expected = ArgumentCaptor.forClass(Post.class);
-        verify(postRepository, times(1)).saveAndFlush(expected.capture());
 
+        Post actual = postService.createPost(new PostRqDto());
+
+        verify(postRepository, times(1)).saveAndFlush(expected.capture());
         assertThat(actual)
-                .isEqualTo(postMapper.postToPostDto(expected.getValue()));
+                .isEqualTo(expected.getValue());
     }
 
     @Test
@@ -110,15 +103,15 @@ class PostServiceImplTest {
 
     @Test
     public void test_updatePost_expectValue() {
+        ArgumentCaptor<Post> expected = ArgumentCaptor.forClass(Post.class);
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
-        PostDto actual = postService.updatePost(1L, new PostRqDto());
+        Post actual = postService.updatePost(1L, new PostRqDto());
 
-        ArgumentCaptor<Post> expected = ArgumentCaptor.forClass(Post.class);
         verify(postRepository, times(1)).saveAndFlush(expected.capture());
 
         assertThat(actual)
-                .isEqualTo(postMapper.postToPostDto(expected.getValue()));
+                .isEqualTo(expected.getValue());
     }
 
     @Test

@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.mirea.api.PostApiDelegate;
+import ru.mirea.domain.Post;
 import ru.mirea.dto.PostDto;
 import ru.mirea.dto.PostRqDto;
+import ru.mirea.mapper.PostMapper;
+import ru.mirea.service.LikeService;
 import ru.mirea.service.PostService;
 
 import java.util.List;
@@ -17,21 +20,28 @@ import java.util.List;
 public class PostApiDelegateImpl implements PostApiDelegate {
 
     private final PostService postService;
+    private final LikeService likeService;
+    private final PostMapper postMapper;
 
     @Override
     public ResponseEntity<List<PostDto>> getPosts() {
-        return ResponseEntity.ok(postService.findAll());
+        List<PostDto> posts = postService.findAll().stream()
+                .map(this::buildPostDtoWithLikeCount)
+                .toList();
+        return ResponseEntity.ok(posts);
     }
 
     @Override
     public ResponseEntity<PostDto> createPost(@Valid PostRqDto postRqDto) {
+        Post post = postService.createPost(postRqDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(postService.createPost(postRqDto));
+                .body(buildPostDtoWithLikeCount(post));
     }
 
     @Override
     public ResponseEntity<PostDto> getPost(Long postId) {
-        return ResponseEntity.ok(postService.findById(postId));
+        Post post = postService.findById(postId);
+        return ResponseEntity.ok(buildPostDtoWithLikeCount(post));
     }
 
     @Override
@@ -42,6 +52,12 @@ public class PostApiDelegateImpl implements PostApiDelegate {
 
     @Override
     public ResponseEntity<PostDto> updatePost(Long postId, @Valid PostRqDto postRqDto) {
-        return ResponseEntity.ok(postService.updatePost(postId, postRqDto));
+        Post post = postService.updatePost(postId, postRqDto);
+        return ResponseEntity.ok(buildPostDtoWithLikeCount(post));
+    }
+
+    private PostDto buildPostDtoWithLikeCount(Post post) {
+        return postMapper.postToPostDto(post)
+                .likeCount(likeService.countLikesByPost(post));
     }
 }

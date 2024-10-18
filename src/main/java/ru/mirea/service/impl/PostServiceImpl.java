@@ -3,10 +3,8 @@ package ru.mirea.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.mirea.domain.Post;
-import ru.mirea.dto.PostDto;
 import ru.mirea.dto.PostRqDto;
 import ru.mirea.exception.PostNotFoundException;
-import ru.mirea.mapper.PostMapper;
 import ru.mirea.repository.PostRepository;
 import ru.mirea.service.PostService;
 
@@ -18,28 +16,31 @@ import java.util.List;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
 
     @Override
-    public List<PostDto> findAll() {
-        return postRepository.findAll().stream()
-                .map(postMapper::postToPostDto)
-                .toList();
+    public List<Post> findAll() {
+        return postRepository.findAll();
     }
 
     @Override
-    public PostDto findById(Long postId) {
+    public Post findById(Long postId) {
         return postRepository.findById(postId)
-                .map(postMapper::postToPostDto)
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
     @Override
-    public PostDto createPost(PostRqDto requestBody) {
-        Post post = postMapper.createPostRqDtoToPost(requestBody);
-        post.setCreatedAt(LocalDateTime.now());
+    public Post createPost(PostRqDto requestBody) {
+
+        Post post = Post.builder()
+                .createdAt(LocalDateTime.now())
+                .title(requestBody.getTitle())
+                .content(requestBody.getContent())
+                .author(requestBody.getAuthor())
+                .build();
+
         postRepository.saveAndFlush(post);
-        return postMapper.postToPostDto(post);
+
+        return post;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto updatePost(Long postId, PostRqDto requestBody) {
+    public Post updatePost(Long postId, PostRqDto requestBody) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
         post.setUpdatedAt(LocalDateTime.now())
@@ -60,6 +61,6 @@ public class PostServiceImpl implements PostService {
 
         postRepository.saveAndFlush(post);
 
-        return postMapper.postToPostDto(post);
+        return post;
     }
 }

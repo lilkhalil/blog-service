@@ -11,12 +11,11 @@ import ru.mirea.domain.Post;
 import ru.mirea.exception.LikeNotFoundException;
 import ru.mirea.exception.PostNotFoundException;
 import ru.mirea.repository.LikeRepository;
-import ru.mirea.repository.PostRepository;
+import ru.mirea.service.PostService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,7 +27,7 @@ class LikeServiceImplTest {
     @Mock
     private LikeRepository likeRepository;
     @Mock
-    private PostRepository postRepository;
+    private PostService postService;
 
     @InjectMocks
     private LikeServiceImpl likeService;
@@ -54,7 +53,7 @@ class LikeServiceImplTest {
 
     @Test
     public void test_submitLike_expectLikeSubmitted() {
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(postService.findById(any())).thenReturn(post);
 
         likeService.submitLike(1L);
 
@@ -63,16 +62,15 @@ class LikeServiceImplTest {
 
     @Test
     public void test_submitLike_expectThrowsPostNotFoundException() {
-        when(postRepository.findById(any())).thenReturn(Optional.empty());
+        when(postService.findById(any())).thenThrow(new PostNotFoundException(any()));
 
         assertThatThrownBy(() -> likeService.submitLike(1L))
-                .isInstanceOf(PostNotFoundException.class)
-                .hasMessageMatching("Post with id=\\d+ was not found!");
+                .isInstanceOf(PostNotFoundException.class);
     }
 
     @Test
     public void test_unsubmitLike_expectLikeUnsubmitted() {
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(postService.findById(any())).thenReturn(post);
         when(likeRepository.findByPost(post)).thenReturn(List.of(like));
 
         likeService.unsumbitLike(1L);
@@ -82,16 +80,15 @@ class LikeServiceImplTest {
 
     @Test
     public void test_unsubmitLike_expectThrowsPostNotFoundException() {
-        when(postRepository.findById(any())).thenReturn(Optional.empty());
+        when(postService.findById(any())).thenThrow(new PostNotFoundException(any()));
 
         assertThatThrownBy(() -> likeService.unsumbitLike(1L))
-                .isInstanceOf(PostNotFoundException.class)
-                .hasMessageMatching("Post with id=\\d+ was not found!");
+                .isInstanceOf(PostNotFoundException.class);
     }
 
     @Test
     public void test_unsubmitLike_expectThrowsLikeNotFoundException() {
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(postService.findById(any())).thenReturn(post);
         when(likeRepository.findByPost(post)).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> likeService.unsumbitLike(1L))
