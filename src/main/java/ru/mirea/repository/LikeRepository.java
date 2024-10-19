@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
     List<Like> findByPost(Post post);
-    Integer countByPost(Post post);
 }

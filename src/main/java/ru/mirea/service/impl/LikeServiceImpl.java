@@ -40,9 +40,4 @@ public class LikeServiceImpl implements LikeService {
                     throw new LikeNotFoundException(postId);
                 });
     }
-
-    @Override
-    public Integer countLikesByPost(Post post) {
-        return likeRepository.countByPost(post);
-    }
 }
